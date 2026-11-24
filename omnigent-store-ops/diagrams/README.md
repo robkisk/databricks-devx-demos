@@ -1,7 +1,7 @@
 # Diagrams
 
-The images in this repo's READMEs. Each `.d2` file is the source for a `-light.png` and a `-dark.png`; the
-READMEs pick one with `<picture>`, so they follow your color scheme.
+The images in this repo's READMEs. Each `.d2` file is the source for one `-light.png`, which the READMEs show
+in both GitHub themes: the light diagrams read well on a dark page too.
 
 | Source | Shows |
 | --- | --- |

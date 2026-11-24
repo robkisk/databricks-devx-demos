@@ -31,10 +31,7 @@ just the prompt.
 
 ### What runs where
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="omnigent-store-ops/diagrams/architecture-dark.png">
-  <img alt="Your laptop installs the agent on Omnigent on Databricks and follows its sessions. The server reaches a Databricks Sandbox host over a tunnel, and the agent on that host calls a UC skill, Genie One MCP, Databricks SQL MCP, and Claude through Unity Gateway." src="omnigent-store-ops/diagrams/architecture-light.png" width="720">
-</picture>
+<img alt="Your laptop installs the agent on Omnigent on Databricks and follows its sessions. The server reaches a Databricks Sandbox host over a tunnel, and the agent on that host calls a UC skill, Genie One MCP, Databricks SQL MCP, and Claude through Unity Gateway." src="omnigent-store-ops/diagrams/architecture-light.png" width="720">
 
 The agent is one `config.yaml` and no code. Everything else comes from the workspace:
 
@@ -53,10 +50,7 @@ its [custom agent](https://omnigent.ai/docs/use/custom-agents) format on the `cl
 
 ### One question, end to end
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="omnigent-store-ops/diagrams/one-turn-dark.png">
-  <img alt="A sequence diagram. You send the question to Omnigent on Databricks, which runs the turn on the Sandbox host. The agent loads its playbook from the UC skills MCP, sends a SELECT on stores_at_risk through the CEL guardrail, which allows it, runs it on the Databricks SQL MCP, then calls replenishment_plan for each store, and returns the answer with every tool call. omni attach streams the transcript live." src="omnigent-store-ops/diagrams/one-turn-light.png" width="820">
-</picture>
+<img alt="A sequence diagram. You send the question to Omnigent on Databricks, which runs the turn on the Sandbox host. The agent loads its playbook from the UC skills MCP, sends a SELECT on stores_at_risk through the CEL guardrail, which allows it, runs it on the Databricks SQL MCP, then calls replenishment_plan for each store, and returns the answer with every tool call. omni attach streams the transcript live." src="omnigent-store-ops/diagrams/one-turn-light.png" width="820">
 
 The agent loads its playbook by full name before its first answer, every session. Fix the playbook in UC and
 the next load picks it up, with no reinstall. The post's [Fix the skill, not the agent](https://terminalpoet.com/posts/omnigent/#fix-the-skill-not-the-agent)
@@ -65,10 +59,7 @@ section shows that happening in a live session, and the folder README shows you
 
 ### The data
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="omnigent-store-ops/diagrams/data-model-dark.png">
-  <img alt="databricks bundle deploy runs a job that creates eight tables in the retail_stockout schema. The tables and two scalar UC functions feed the v_stockout_risk view, which feeds the two table functions the agent calls through the Databricks SQL MCP. Genie One and the Genie Agent read the tables, and the AI/BI dashboard reads the view." src="omnigent-store-ops/diagrams/data-model-light.png" width="860">
-</picture>
+<img alt="databricks bundle deploy runs a job that creates eight tables in the retail_stockout schema. The tables and two scalar UC functions feed the v_stockout_risk view, which feeds the two table functions the agent calls through the Databricks SQL MCP. Genie One and the Genie Agent read the tables, and the AI/BI dashboard reads the view." src="omnigent-store-ops/diagrams/data-model-light.png" width="860">
 
 One [DABs](https://docs.databricks.com/aws/en/dev-tools/bundles/) bundle builds everything in
 `<catalog>.retail_stockout`, generated in SQL with no external files:
@@ -93,10 +84,7 @@ One [DABs](https://docs.databricks.com/aws/en/dev-tools/bundles/) bundle builds 
 
 ### Read-only, enforced twice
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="omnigent-store-ops/diagrams/read-only-dark.png">
-  <img alt="A request that would write data meets layer 1, the playbook's read-only rule, where the agent refuses a CREATE TABLE. A tool call it does make meets layer 2, the CEL guardrail in Omnigent, which denies SET and EXPLAIN WITH INSERT before they reach the warehouse and allows one read statement through to the Databricks SQL MCP." src="omnigent-store-ops/diagrams/read-only-light.png" width="860">
-</picture>
+<img alt="A request that would write data meets layer 1, the playbook's read-only rule, where the agent refuses a CREATE TABLE. A tool call it does make meets layer 2, the CEL guardrail in Omnigent, which denies SET and EXPLAIN WITH INSERT before they reach the warehouse and allows one read statement through to the Databricks SQL MCP." src="omnigent-store-ops/diagrams/read-only-light.png" width="860">
 
 The playbook tells the agent it's read-only, and the agent follows it. A prompt is not a control, though, so
 the agent also carries a [CEL](https://cel.dev/) policy that Omnigent checks before every tool call:
@@ -133,10 +121,7 @@ What each layer caught, in the post's run (November 23) and this repo's verifica
 
 ### Run it
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="omnigent-store-ops/diagrams/setup-dark.png">
-  <img alt="Seven steps on your laptop and what each leaves behind: bundle deploy creates the data schema; render.py writes build/; the MCP and policy checks change nothing; publish_skill.py creates the UC skill; omnigent agent add installs the agent at version 1; sandbox_host.sh sets up the Sandbox host; omni_rest.py creates a session and gets answers. reset.sh removes the sessions, agent, skill, and build/, and keeps the data and host." src="omnigent-store-ops/diagrams/setup-light.png" width="620">
-</picture>
+<img alt="Seven steps on your laptop and what each leaves behind: bundle deploy creates the data schema; render.py writes build/; the MCP and policy checks change nothing; publish_skill.py creates the UC skill; omnigent agent add installs the agent at version 1; sandbox_host.sh sets up the Sandbox host; omni_rest.py creates a session and gets answers. reset.sh removes the sessions, agent, skill, and build/, and keeps the data and host." src="omnigent-store-ops/diagrams/setup-light.png" width="620">
 
 **You need:**
 

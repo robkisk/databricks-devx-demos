@@ -14,10 +14,7 @@ databricks-sdk 0.170.0, mcp 2.3.0, and Claude Opus 5.5 through Unity Gateway. Th
 For the video walkthrough, see [RUNBOOK.md](RUNBOOK.md). For diagrams of the request path, the data, and
 the read-only guardrail, see the [repo README](../README.md#omnigent-store-ops).
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="diagrams/architecture-dark.png">
-  <img alt="Your laptop installs the agent on Omnigent on Databricks and follows its sessions. The server reaches a Databricks Sandbox host over a tunnel, and the agent on that host calls a UC skill, Genie One MCP, Databricks SQL MCP, and Claude through Unity Gateway." src="diagrams/architecture-light.png" width="720">
-</picture>
+<img alt="Your laptop installs the agent on Omnigent on Databricks and follows its sessions. The server reaches a Databricks Sandbox host over a tunnel, and the agent on that host calls a UC skill, Genie One MCP, Databricks SQL MCP, and Claude through Unity Gateway." src="diagrams/architecture-light.png" width="720">
 
 ## What's here
 
@@ -69,10 +66,7 @@ export SANDBOX=<your-sandbox-name> WORKSPACE_URL=https://<workspace-host>
 cd omnigent-store-ops
 ```
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="diagrams/setup-dark.png">
-  <img alt="Seven steps on your laptop and what each leaves behind, plus reset.sh, which removes the sessions, agent, skill, and build/ and keeps the data and host." src="diagrams/setup-light.png" width="620">
-</picture>
+<img alt="Seven steps on your laptop and what each leaves behind, plus reset.sh, which removes the sessions, agent, skill, and build/ and keeps the data and host." src="diagrams/setup-light.png" width="620">
 
 ## 1. Deploy the data
 
