@@ -1,0 +1,38 @@
+# The seven steps in the README, and what each one leaves behind.
+# Render: see diagrams/README.md.
+
+vars: { d2-config: { pad: 24 } }
+
+grid-rows: 9
+grid-columns: 2
+horizontal-gap: 120
+vertical-gap: 18
+
+h1: On your laptop { shape: text; style.font-size: 20; style.bold: true }
+h2: What it leaves behind { shape: text; style.font-size: 20; style.bold: true }
+
+s1: 1 · databricks bundle deploy { class: source; width: 330 }
+r1: <catalog>.retail_stockout: tables, view,\nfunctions, Genie Agent, dashboard { class: store; width: 380 }
+s2: 2 · scripts/render.py { class: source; width: 330 }
+r2: build/: SKILL.md and config.yaml\nfor your host and catalog { class: compute; width: 380 }
+s3: 3 · mcp_tools.py · test_policy.py { class: source; width: 330 }
+r3: nothing: read-only checks { class: group; width: 380 }
+s4: 4 · scripts/publish_skill.py { class: source; width: 330 }
+r4: UC skill\n<catalog>.agent_skills.store-ops-analyst { class: store; width: 380 }
+s5: 5 · omnigent agent add { class: source; width: 330 }
+r5: Omnigent agent store-ops-analyst, version 1 { class: serve; width: 380 }
+s6: 6 · scripts/sandbox_host.sh setup { class: source; width: 330 }
+r6: Sandbox host running omnigent at d04000ef { class: compute; width: 380 }
+s7: 7 · omni_rest.py session · ask { class: source; width: 330 }
+r7: a session, and the agent's answers { class: serve; width: 380 }
+s8: scripts/reset.sh { class: govern; width: 330 }
+r8: sessions, agent, skill, and build/ removed,\ndata and host kept for the next take { class: group; width: 380 }
+
+s1 -> r1
+s2 -> r2
+s3 -> r3
+s4 -> r4
+s5 -> r5
+s6 -> r6
+s7 -> r7 { class: accent }
+s8 -> r8 { class: govlink }

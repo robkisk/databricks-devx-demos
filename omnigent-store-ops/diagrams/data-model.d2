@@ -1,0 +1,64 @@
+# What `databricks bundle deploy` builds in <catalog>.retail_stockout, and who reads it.
+# Render: see diagrams/README.md.
+
+vars: { d2-config: { pad: 24 } }
+
+direction: right
+
+job: databricks bundle deploy\nruns a job: tables → functions → checks {
+  class: compute
+  icon: ${ICONS}/databricks/workflows.svg
+  icon.near: bottom-center
+  label.near: top-center
+  width: 260
+  height: 130
+}
+
+tables: 8 tables in <catalog>.retail_stockout {
+  class: group
+  grid-columns: 2
+  grid-gap: 12
+  demo_config: demo_config\nas_of_date 2026-10-30 { class: store }
+  stores: stores\n32, in 4 regions { class: store }
+  products: products\n120 SKUs, promo flag { class: store }
+  suppliers: suppliers\nlead times { class: store }
+  sales_daily: sales_daily\n60 days { class: store }
+  inventory_snapshot: inventory_snapshot\non hand, on order { class: store }
+  dim_region: dim_region { class: store }
+  dim_category: dim_category { class: store }
+}
+
+helpers: Scalar UC functions {
+  class: group
+  grid-columns: 1
+  grid-gap: 12
+  risk: stockout_risk_level()\nHIGH · MEDIUM · LOW { class: compute }
+  reorder: reorder_qty()\nunits, in whole cases { class: compute }
+}
+
+view: v_stockout_risk\none row per store × SKU\ncover, risk, reorder, cost {
+  class: store
+  shape: cylinder
+  width: 230
+  height: 140
+}
+
+tools: The agent's tools (UC functions) {
+  class: group
+  grid-columns: 1
+  grid-gap: 12
+  at_risk: stores_at_risk(region, category, n) { class: serve }
+  plan: replenishment_plan(store_id) { class: serve }
+}
+
+agent: The agent, through the\nDatabricks SQL MCP { class: source }
+genie: Genie One MCP\nand the Genie Agent { class: source; icon: ${ICONS}/databricks/genie.svg }
+dash: AI/BI dashboard { class: source; icon: ${ICONS}/databricks/ai_bi.svg }
+
+job -> tables: creates
+tables -> view
+helpers -> view: used by
+view -> tools
+tools -> agent { class: accent }
+view -> dash
+tables -> genie

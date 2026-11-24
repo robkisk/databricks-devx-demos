@@ -11,7 +11,13 @@ host), Omnigent on Databricks (Beta, server 0.23.0.dev0), Databricks CLI v1.27.0
 databricks-sdk 0.170.0, mcp 2.3.0, and Claude Opus 5.5 through Unity Gateway. The agent ran on Omnigent's
 `claude-sdk` harness.
 
-For the video walkthrough, see [RUNBOOK.md](RUNBOOK.md).
+For the video walkthrough, see [RUNBOOK.md](RUNBOOK.md). For diagrams of the request path, the data, and
+the read-only guardrail, see the [repo README](../README.md#omnigent-store-ops).
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="diagrams/architecture-dark.png">
+  <img alt="Your laptop installs the agent on Omnigent on Databricks and follows its sessions. The server reaches a Databricks Sandbox host over a tunnel, and the agent on that host calls a UC skill, Genie One MCP, Databricks SQL MCP, and Claude through Unity Gateway." src="diagrams/architecture-light.png" width="720">
+</picture>
 
 ## What's here
 
@@ -28,6 +34,7 @@ scripts/sandbox_host.sh installs omnigent on a Sandbox and registers it as a hos
 scripts/omni_rest.py    creates sessions on a host, asks questions, shows transcripts, deletes sessions
 scripts/clean_room.sh   a shell with its own HOME, for recording
 scripts/reset.sh        puts everything back to a clean start
+diagrams/               D2 sources and rendered PNGs for the READMEs
 ```
 
 The data is synthetic and deterministic: 32 stores in four regions, 120 SKUs, 60 days of sales, all pinned to
@@ -61,6 +68,11 @@ export PROFILE=<your-cli-profile> CATALOG=<your-catalog>
 export SANDBOX=<your-sandbox-name> WORKSPACE_URL=https://<workspace-host>
 cd omnigent-store-ops
 ```
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="diagrams/setup-dark.png">
+  <img alt="Seven steps on your laptop and what each leaves behind, plus reset.sh, which removes the sessions, agent, skill, and build/ and keeps the data and host." src="diagrams/setup-light.png" width="620">
+</picture>
 
 ## 1. Deploy the data
 

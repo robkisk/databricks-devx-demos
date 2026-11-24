@@ -1,0 +1,26 @@
+# One question, end to end: the Pacific question from the README.
+# Render: see diagrams/README.md.
+
+vars: { d2-config: { pad: 24 } }
+
+shape: sequence_diagram
+
+you: You\nomni_rest.py ask { class: source }
+server: Omnigent on Databricks { class: serve }
+agent: store-ops-analyst\non the Sandbox host { class: compute }
+skills: UC skills MCP { class: store }
+guard: CEL guardrail\nsql_reads_only { class: govern }
+sql: Databricks SQL MCP { class: serve }
+
+you -> server: "Which Pacific stores are most at risk?"
+server -> agent: run the turn
+agent -> skills: load_skill <catalog>.agent_skills.store-ops-analyst
+skills -> agent: SKILL.md: where the data is, the rules, the format
+agent -> guard: execute_sql: SELECT * FROM stores_at_risk('Pacific', NULL, 3)
+guard -> agent: allow: one read statement
+agent -> sql: run it, then poll_sql_result
+sql -> agent: S-021, S-025, S-017 with counts and costs
+agent -> sql: replenishment_plan for each store (allowed the same way)
+sql -> agent: draft lines and long-lead lines
+agent -> server: the answer, plus every tool call
+server -> you: transcript (omni attach streams it live) { class: accent }

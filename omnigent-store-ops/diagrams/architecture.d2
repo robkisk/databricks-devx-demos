@@ -1,0 +1,72 @@
+# What runs where. Colors come from the Databricks theme that render_d2.sh prepends, so this file sets none.
+# Render: see diagrams/README.md.
+
+vars: { d2-config: { pad: 24 } }
+
+grid-rows: 3
+vertical-gap: 90
+
+laptop: Your laptop\nDatabricks CLI · omni CLI · this repo's scripts\nomnigent agent add · omni attach {
+  class: source
+  width: 480
+  height: 110
+}
+
+ws: Your Databricks workspace {
+  class: group
+  grid-columns: 2
+  horizontal-gap: 90
+  server: Omnigent on Databricks (Beta)\nsessions · agents · policies {
+    class: serve
+    width: 290
+    height: 110
+  }
+  host: Databricks Sandbox (Beta)\nomni host, built from main\nruns the store-ops-analyst agent {
+    class: compute
+    width: 290
+    height: 110
+  }
+}
+ws.server <-> ws.host: tunnel
+
+uc: Governed by UC and Unity Gateway {
+  class: group
+  grid-columns: 2
+  horizontal-gap: 40
+  vertical-gap: 30
+  skill: UC skill (Beta)\nthe store-ops playbook {
+    class: store
+    width: 290
+    height: 110
+    label.near: top-center
+    icon: ${ICONS}/databricks/unity_catalog.svg
+    icon.near: bottom-center
+  }
+  model: Claude Opus 5.5\nthrough Unity Gateway {
+    class: govern
+    width: 290
+    height: 110
+    label.near: top-center
+    icon: ${ICONS}/databricks/unity_ai_gateway.svg
+    icon.near: bottom-center
+  }
+  genie: Genie One MCP\nopen questions {
+    class: serve
+    width: 290
+    height: 110
+    label.near: top-center
+    icon: ${ICONS}/databricks/genie.svg
+    icon.near: bottom-center
+  }
+  sql: Databricks SQL MCP (Beta)\nexact numbers, read-only {
+    class: serve
+    width: 290
+    height: 110
+    label.near: top-center
+    icon: ${ICONS}/databricks/sql_warehouse.svg
+    icon.near: bottom-center
+  }
+}
+
+laptop -> ws.server: install the agent, start and follow sessions
+ws.host -> uc: skill, tool, and model calls { class: accent }

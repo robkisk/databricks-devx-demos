@@ -1,0 +1,42 @@
+# Read-only, enforced twice: the playbook asks, the platform enforces.
+# Render: see diagrams/README.md.
+
+vars: { d2-config: { pad: 24 } }
+
+direction: right
+
+ask: A request that\nwould write data {
+  class: source
+  shape: person
+}
+
+playbook: Layer 1: the playbook\nUC skill rule: "Read only.\nNever run INSERT, … DROP, or ALTER." {
+  class: store
+}
+
+policy: Layer 2: the CEL guardrail\nOmnigent, before the tool runs:\none SELECT · WITH · SHOW · DESCRIBE · EXPLAIN,\nno write keyword, a string query {
+  class: govern
+}
+
+sql: Databricks SQL MCP\nthen the SQL warehouse {
+  class: serve
+  icon: ${ICONS}/databricks/sql_warehouse.svg
+  icon.near: bottom-center
+  label.near: top-center
+}
+
+refused: The agent refuses\n"CREATE TABLE …" {
+  class: source
+  style.stroke-dash: 4
+}
+
+denied: Denied by policy\n"SET …", "EXPLAIN WITH … INSERT" {
+  class: source
+  style.stroke-dash: 4
+}
+
+ask -> playbook
+playbook -> policy: a tool call it chose to make
+policy -> sql: allowed { class: accent }
+playbook -> refused: stops here
+policy -> denied: never reaches the warehouse
