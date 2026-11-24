@@ -65,7 +65,7 @@ try:
     w.ai_gateway.get_skill(full_name)
 except NotFound:
     w.ai_gateway.create_skill(
-        Skill(comment="Store-ops analyst playbook from github.com/robkisk/terminal-poet-demos (omnigent-store-ops)."),
+        Skill(comment="Store-ops analyst playbook from github.com/robkisk/databricks-devx-demos (omnigent-store-ops)."),
         parent=f"schemas/{args.catalog}.{args.schema}", skill_id=skill)
     print("created", full_name)
 

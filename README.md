@@ -1,7 +1,10 @@
-# terminal-poet demos
+# Databricks DevX demos
 
-Runnable code for posts on [terminalpoet.com](https://terminalpoet.com). Each demo lives in its own folder,
-with the exact commands, the versions it was verified with, and a way to tear it all down.
+Runnable demos of Databricks developer tooling: agents and harnesses, CLIs, and the platform pieces behind
+them. Each demo lives in its own folder, with the exact commands, the versions it was verified with, and a way
+to tear it all down. Most have a companion post on [terminalpoet.com](https://terminalpoet.com).
+
+This is a personal project, not an official Databricks repository.
 
 | Demo | Post | What it shows |
 | --- | --- | --- |
@@ -139,7 +142,7 @@ What each layer caught, in the post's run (November 23) and this repo's verifica
 output):
 
 ```bash
-git clone https://github.com/robkisk/terminal-poet-demos && cd terminal-poet-demos/omnigent-store-ops
+git clone https://github.com/robkisk/databricks-devx-demos && cd databricks-devx-demos/omnigent-store-ops
 export PROFILE=<your-cli-profile> CATALOG=<your-catalog>
 export SANDBOX=<your-sandbox-name> WORKSPACE_URL=https://<workspace-host>
 

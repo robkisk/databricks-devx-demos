@@ -1,7 +1,8 @@
-# terminal-poet demos
+# Databricks DevX demos
 
-Public, runnable demos for posts on terminalpoet.com. One folder per demo, each with a README (exact
-commands, verified versions, teardown) and, where there's a video, a RUNBOOK.md.
+Public, runnable demos of Databricks developer tooling, most with a companion post on terminalpoet.com.
+One folder per demo, each with a README (exact commands, verified versions, teardown) and, where there's a
+video, a RUNBOOK.md. Add each new demo to the table at the top of the root README.md.
 
 - **Public information only.** No workspace hosts or IDs, catalog names, emails, profile names, warehouse,
   session, host, or agent IDs, internal tool names, or internal links. Templates use `{{placeholders}}`, and
