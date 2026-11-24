@@ -1,0 +1,12 @@
+resources:
+  dashboards:
+    stockout_dashboard:
+      display_name: ${var.customer_name} stock-out risk (${var.schema})
+      file_path: ../src/dashboards/stockout.lvdash.json
+      warehouse_id: ${var.warehouse_id}
+      dataset_catalog: ${var.catalog}
+      dataset_schema: ${var.schema}
+      embed_credentials: true
+      lifecycle:
+        depends_on:
+          - resource: job_runs.stockout_build_run

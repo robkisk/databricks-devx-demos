@@ -1,0 +1,8 @@
+# Runs the build job during deploy, so the Genie Agent and dashboard land on populated tables.
+resources:
+  job_runs:
+    stockout_build_run:
+      job_id: ${resources.jobs.stockout_build.id}
+      lifecycle:
+        triggers:
+          - on_file_change: ../src/sql/*.sql

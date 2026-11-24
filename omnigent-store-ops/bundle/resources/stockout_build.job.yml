@@ -1,0 +1,37 @@
+resources:
+  jobs:
+    stockout_build:
+      name: "[${var.schema}] stock-out demo build"
+      description: Builds the ${var.customer_name} stock-out demo tables, functions, and checks.
+      max_concurrent_runs: 1
+      tasks:
+        - task_key: tables
+          sql_task:
+            warehouse_id: ${var.warehouse_id}
+            file:
+              path: ../src/sql/01_tables.sql
+            parameters:
+              catalog: ${var.catalog}
+              schema: ${resources.schemas.stockout_schema.name}
+              customer_name: ${var.customer_name}
+              as_of_date: ${var.as_of_date}
+        - task_key: functions
+          depends_on:
+            - task_key: tables
+          sql_task:
+            warehouse_id: ${var.warehouse_id}
+            file:
+              path: ../src/sql/02_functions.sql
+            parameters:
+              catalog: ${var.catalog}
+              schema: ${resources.schemas.stockout_schema.name}
+        - task_key: checks
+          depends_on:
+            - task_key: functions
+          sql_task:
+            warehouse_id: ${var.warehouse_id}
+            file:
+              path: ../src/sql/03_checks.sql
+            parameters:
+              catalog: ${var.catalog}
+              schema: ${resources.schemas.stockout_schema.name}

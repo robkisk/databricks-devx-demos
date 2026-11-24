@@ -1,0 +1,41 @@
+# Genie Agent over the demo schema. serialized_space stays inline so ${var.*} resolves in its identifiers.
+resources:
+  genie_spaces:
+    stockout_genie:
+      title: ${var.customer_name} store stock-out agent (${var.schema})
+      description: Ask about stock-out risk, demand trends, and draft replenishment for ${var.customer_name} stores.
+      warehouse_id: ${var.warehouse_id}
+      lifecycle:
+        depends_on:
+          - resource: job_runs.stockout_build_run
+      serialized_space: |
+        {
+          "version": 2,
+          "config": {
+            "sample_questions": [
+              {"id": "a0000000000000000000000000000001", "question": ["Which 5 stores have the most HIGH-risk SKUs?"]},
+              {"id": "a0000000000000000000000000000002", "question": ["Show daily Produce units sold over the last 30 days"]},
+              {"id": "a0000000000000000000000000000003", "question": ["Which promo SKUs are at HIGH risk, by region?"]},
+              {"id": "a0000000000000000000000000000004", "question": ["What is the draft order value for HIGH-risk SKUs by category?"]}
+            ]
+          },
+          "data_sources": {
+            "tables": [
+              {"identifier": "${var.catalog}.${var.schema}.inventory_snapshot", "description": ["Current on-hand and on-order units per store and SKU."]},
+              {"identifier": "${var.catalog}.${var.schema}.products", "description": ["SKUs with category, supplier, case pack, unit cost, lead time, and promo flag."]},
+              {"identifier": "${var.catalog}.${var.schema}.sales_daily", "description": ["Daily units sold and revenue per store and SKU, last 60 days."]},
+              {"identifier": "${var.catalog}.${var.schema}.stores", "description": ["Stores with region and format."]},
+              {"identifier": "${var.catalog}.${var.schema}.suppliers", "description": ["Suppliers and their lead time in days."]},
+              {"identifier": "${var.catalog}.${var.schema}.v_stockout_risk", "description": ["One row per store and SKU with days of cover, risk_level (HIGH, MEDIUM, LOW), draft reorder_units, and est_order_cost. Use it for every risk or reorder question."]}
+            ]
+          },
+          "instructions": {
+            "example_question_sqls": [
+              {"id": "b0000000000000000000000000000001", "question": ["Which 5 stores have the most HIGH-risk SKUs?"], "sql": ["SELECT store_id, store_name, region, count_if(risk_level = 'HIGH') AS high_risk_skus FROM ${var.catalog}.${var.schema}.v_stockout_risk GROUP BY store_id, store_name, region ORDER BY high_risk_skus DESC, store_id LIMIT 5"]},
+              {"id": "b0000000000000000000000000000002", "question": ["Show daily Produce units sold over the last 30 days"], "sql": ["SELECT sd.sale_date, sum(sd.units_sold) AS units_sold FROM ${var.catalog}.${var.schema}.sales_daily sd JOIN ${var.catalog}.${var.schema}.products p ON p.sku_id = sd.sku_id WHERE p.category = 'Produce' AND sd.sale_date > date_sub((SELECT max(sale_date) FROM ${var.catalog}.${var.schema}.sales_daily), 30) GROUP BY sd.sale_date ORDER BY sd.sale_date"]}
+            ],
+            "text_instructions": [
+              {"id": "c0000000000000000000000000000001", "content": ["Risk questions use v_stockout_risk.risk_level: HIGH means days of cover is shorter than the supplier lead time.", "Orders are drafts: say 'draft order', never 'placed'.", "The latest sale_date is demo_config.as_of_date; 'last N days' means sale_date > date_sub(max(sale_date), N)."]}
+            ]
+          }
+        }

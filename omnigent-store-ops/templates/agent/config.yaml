@@ -1,0 +1,58 @@
+spec_version: 1
+name: {{agent_name}}
+description: Answers store stock-out questions with Genie One and read-only SQL, following a playbook it loads live from UC.
+
+executor:
+  type: omnigent
+  model: system.ai.claude-opus-5-5
+  auth: {type: databricks, profile: {{profile}}}   # DEFAULT is the profile a Databricks Sandbox gets
+  config:
+    harness: claude-sdk
+
+prompt: |
+  You are a store-operations analyst. Your playbook is the UC skill
+  {{catalog}}.{{skills_schema}}.store-ops-analyst. Before your first answer, load it
+  with load_skill by that full name, and follow it. Look for skills in no
+  other schema.
+
+skills: none   # nothing from the host's own skill folders: the playbook comes only from UC
+
+tools:
+  uc-skills:
+    type: mcp
+    url: https://{{workspace_host}}/ai-gateway/skills/?schema={{catalog}}.{{skills_schema}}
+    auth: {type: databricks, profile: {{profile}}}
+    tools: [list_skills, load_skill, get_skill_files]
+  genie:
+    type: mcp
+    url: https://{{workspace_host}}/ai-gateway/mcp-services/system.ai.genie_one_mcp?o={{workspace_id}}
+    auth: {type: databricks, profile: {{profile}}}
+    tools: [genie_ask, genie_poll_response, genie_get_query_result]
+  dbsql:
+    type: mcp
+    url: https://{{workspace_host}}/ai-gateway/mcp-services/system.ai.dbsql
+    auth: {type: databricks, profile: {{profile}}}
+    tools: [execute_sql, poll_sql_result]   # run scripts/mcp_tools.py first: your workspace may differ
+
+# Read-only SQL, enforced by Omnigent instead of the prompt: deny any execute_sql call that isn't one
+# SELECT, WITH, SHOW, DESCRIBE, or EXPLAIN statement, or that names a write or session keyword anywhere
+# (WITH ... INSERT is valid SQL). A call without a string `query` is denied too: a CEL error counts as no
+# decision, so without the has() and type() checks such a call would pass. It must sit under
+# guardrails.policies; `omnigent agent add` drops a top-level policies: block without a warning.
+guardrails:
+  policies:
+    sql_reads_only:
+      type: function
+      function:
+        path: omnigent.policies.builtins.cel.cel_policy
+        arguments:
+          expression: >-
+            event.type == "tool_call" && event.data.name.endsWith("execute_sql") &&
+            (!has(event.data.arguments.query) || type(event.data.arguments.query) != string ||
+             !event.data.arguments.query.matches("^\\s*(?i:select|with|show|describe|explain)\\b") ||
+             event.data.arguments.query.matches(";\\s*\\S") ||
+             event.data.arguments.query.matches("(?i)\\b(insert|update|delete|merge|create|drop|alter|truncate|grant|revoke|copy|set|use|call|optimize|vacuum|refresh|msck)\\b"))
+            ? {"result": "DENY"} : null
+          reason: This agent runs read-only SQL. Send one SELECT, WITH, SHOW, DESCRIBE, or EXPLAIN statement.
+
+# No os_env: the agent gets no shell or file tools, only the MCP tools above.

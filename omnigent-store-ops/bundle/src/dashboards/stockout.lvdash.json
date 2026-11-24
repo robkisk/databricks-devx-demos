@@ -1,0 +1,172 @@
+{
+  "datasets": [
+    {
+      "name": "ds_kpis",
+      "displayName": "Risk KPIs",
+      "queryLines": [
+        "SELECT count_if(risk_level = 'HIGH') AS high_risk_skus, ",
+        "count(DISTINCT CASE WHEN risk_level = 'HIGH' THEN store_id END) AS stores_with_high_risk, ",
+        "round(sum(CASE WHEN risk_level IN ('HIGH', 'MEDIUM') THEN est_order_cost ELSE 0 END), 2) AS draft_order_value ",
+        "FROM v_stockout_risk"
+      ]
+    },
+    {
+      "name": "ds_region_category",
+      "displayName": "HIGH risk by region and category",
+      "queryLines": [
+        "SELECT region, category, count_if(risk_level = 'HIGH') AS high_risk_skus ",
+        "FROM v_stockout_risk GROUP BY region, category"
+      ]
+    },
+    {
+      "name": "ds_trend",
+      "displayName": "Daily units by category",
+      "queryLines": [
+        "SELECT sd.sale_date, p.category, sum(sd.units_sold) AS units_sold ",
+        "FROM sales_daily sd JOIN products p ON p.sku_id = sd.sku_id ",
+        "GROUP BY sd.sale_date, p.category"
+      ]
+    },
+    {
+      "name": "ds_top_risk",
+      "displayName": "Top 50 HIGH-risk lines",
+      "queryLines": [
+        "SELECT store_id, store_name, region, sku_id, product_name, category, is_promo, days_of_cover, ",
+        "lead_time_days, reorder_units, est_order_cost ",
+        "FROM v_stockout_risk WHERE risk_level = 'HIGH' ",
+        "ORDER BY days_of_cover / lead_time_days, est_order_cost DESC LIMIT 50"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "risk",
+      "displayName": "Stock-out risk",
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layout": [
+        {
+          "widget": {
+            "name": "title",
+            "multilineTextboxSpec": {
+              "lines": ["## Store stock-out risk", "SKUs whose days of cover are shorter than the supplier lead time, with the draft replenishment order."]
+            }
+          },
+          "position": {"x": 0, "y": 0, "width": 6, "height": 2}
+        },
+        {
+          "widget": {
+            "name": "kpi-high-risk",
+            "queries": [{"name": "main_query", "query": {"datasetName": "ds_kpis", "fields": [{"name": "high_risk_skus", "expression": "`high_risk_skus`"}], "disaggregated": true}}],
+            "spec": {"version": 2, "widgetType": "counter", "encodings": {"value": {"fieldName": "high_risk_skus", "displayName": "HIGH-risk store-SKUs"}}, "frame": {"showTitle": true, "title": "HIGH-risk store-SKUs"}}
+          },
+          "position": {"x": 0, "y": 2, "width": 2, "height": 3}
+        },
+        {
+          "widget": {
+            "name": "kpi-stores",
+            "queries": [{"name": "main_query", "query": {"datasetName": "ds_kpis", "fields": [{"name": "stores_with_high_risk", "expression": "`stores_with_high_risk`"}], "disaggregated": true}}],
+            "spec": {"version": 2, "widgetType": "counter", "encodings": {"value": {"fieldName": "stores_with_high_risk", "displayName": "Stores with HIGH risk"}}, "frame": {"showTitle": true, "title": "Stores with HIGH risk"}}
+          },
+          "position": {"x": 2, "y": 2, "width": 2, "height": 3}
+        },
+        {
+          "widget": {
+            "name": "kpi-order-value",
+            "queries": [{"name": "main_query", "query": {"datasetName": "ds_kpis", "fields": [{"name": "draft_order_value", "expression": "`draft_order_value`"}], "disaggregated": true}}],
+            "spec": {"version": 2, "widgetType": "counter", "encodings": {"value": {"fieldName": "draft_order_value", "displayName": "Draft order value", "format": {"type": "number-currency", "currencyCode": "USD", "abbreviation": "compact", "decimalPlaces": {"type": "max", "places": 1}}}}, "frame": {"showTitle": true, "title": "Draft order value (HIGH + MEDIUM)"}}
+          },
+          "position": {"x": 4, "y": 2, "width": 2, "height": 3}
+        },
+        {
+          "widget": {
+            "name": "bar-region-category",
+            "queries": [{"name": "main_query", "query": {"datasetName": "ds_region_category", "fields": [
+              {"name": "region", "expression": "`region`"},
+              {"name": "category", "expression": "`category`"},
+              {"name": "sum(high_risk_skus)", "expression": "SUM(`high_risk_skus`)"}
+            ], "disaggregated": false}}],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {"fieldName": "region", "scale": {"type": "categorical"}, "displayName": "Region"},
+                "y": {"fieldName": "sum(high_risk_skus)", "scale": {"type": "quantitative"}, "displayName": "HIGH-risk SKUs"},
+                "color": {"fieldName": "category", "scale": {"type": "categorical"}, "displayName": "Category"}
+              },
+              "frame": {"showTitle": true, "title": "HIGH-risk SKUs by region and category"}
+            }
+          },
+          "position": {"x": 0, "y": 5, "width": 3, "height": 6}
+        },
+        {
+          "widget": {
+            "name": "line-trend",
+            "queries": [{"name": "main_query", "query": {"datasetName": "ds_trend", "fields": [
+              {"name": "sale_date", "expression": "`sale_date`"},
+              {"name": "category", "expression": "`category`"},
+              {"name": "sum(units_sold)", "expression": "SUM(`units_sold`)"}
+            ], "disaggregated": false}}],
+            "spec": {
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {"fieldName": "sale_date", "scale": {"type": "temporal"}, "displayName": "Date"},
+                "y": {"fieldName": "sum(units_sold)", "scale": {"type": "quantitative"}, "displayName": "Units sold"},
+                "color": {"fieldName": "category", "scale": {"type": "categorical"}, "displayName": "Category"}
+              },
+              "frame": {"showTitle": true, "title": "Daily units sold by category (promo lift in the last 10 days)"}
+            }
+          },
+          "position": {"x": 3, "y": 5, "width": 3, "height": 6}
+        },
+        {
+          "widget": {
+            "name": "table-top-risk",
+            "queries": [{"name": "main_query", "query": {"datasetName": "ds_top_risk", "fields": [
+              {"name": "store_id", "expression": "`store_id`"},
+              {"name": "store_name", "expression": "`store_name`"},
+              {"name": "region", "expression": "`region`"},
+              {"name": "sku_id", "expression": "`sku_id`"},
+              {"name": "product_name", "expression": "`product_name`"},
+              {"name": "category", "expression": "`category`"},
+              {"name": "is_promo", "expression": "`is_promo`"},
+              {"name": "days_of_cover", "expression": "`days_of_cover`"},
+              {"name": "lead_time_days", "expression": "`lead_time_days`"},
+              {"name": "reorder_units", "expression": "`reorder_units`"},
+              {"name": "est_order_cost", "expression": "`est_order_cost`"}
+            ], "disaggregated": true}}],
+            "spec": {
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {"columns": [
+                {"fieldName": "store_id", "displayName": "Store"},
+                {"fieldName": "store_name", "displayName": "Store name"},
+                {"fieldName": "region", "displayName": "Region"},
+                {"fieldName": "sku_id", "displayName": "SKU"},
+                {"fieldName": "product_name", "displayName": "Product"},
+                {"fieldName": "category", "displayName": "Category"},
+                {"fieldName": "is_promo", "displayName": "Promo"},
+                {"fieldName": "days_of_cover", "displayName": "Days of cover"},
+                {"fieldName": "lead_time_days", "displayName": "Lead time (days)"},
+                {"fieldName": "reorder_units", "displayName": "Draft reorder units"},
+                {"fieldName": "est_order_cost", "displayName": "Draft cost", "format": {"type": "number-currency", "currencyCode": "USD", "decimalPlaces": {"type": "max", "places": 0}}}
+              ]},
+              "frame": {"showTitle": true, "title": "Top 50 HIGH-risk lines (most urgent first)"}
+            }
+          },
+          "position": {"x": 0, "y": 11, "width": 6, "height": 8}
+        }
+      ]
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "canvasBackgroundColor": {"light": "#F9F7F4", "dark": "#0B2026"},
+      "widgetBackgroundColor": {"light": "#FFFFFF", "dark": "#1B3139"},
+      "widgetBorderColor": {"light": "#EEEDE9", "dark": "#1B3139"},
+      "fontColor": {"light": "#1B3139", "dark": "#F9F7F4"},
+      "selectionColor": {"light": "#FF3621", "dark": "#FF5F46"},
+      "visualizationColors": ["#FF3621", "#1B3139", "#00A972", "#FFAB00", "#2272B4", "#98102A", "#618794", "#BD89FF"]
+    }
+  }
+}

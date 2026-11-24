@@ -1,0 +1,10 @@
+# Rendered for one workspace by scripts/render.py: holds your host, workspace ID, and catalog.
+build/
+# The recording clean room's HOME: logins, tokens, and an omnigent install.
+.demo-home/
+# Bundle deploy state.
+.databricks/
+__pycache__/
+.DS_Store
+*.log
+.env
