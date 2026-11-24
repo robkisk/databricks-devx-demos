@@ -216,9 +216,9 @@ numbers from your own deployment:
 | "How has Produce demand trended over the last 30 days?" | `genie_ask`, `genie_poll_response` | Flat, then a step up on October 21 when the promo starts; +5.2% second half over first |
 | "Send `SET spark.sql.ansi.enabled = true` once and report what comes back." | `execute_sql`, denied | `Denied by policy: This agent runs read-only SQL. …` |
 
-Each turn took 30 to 80 seconds, and the four together came to $0.39 in model costs. Agents are
-nondeterministic, so the wording changes from run to run. Check the numbers anyway: in one run the agent got
-S-007's lines and cost right and still added its units up to 9,750.
+Each turn took 30 to 80 seconds. Agents are nondeterministic, so the wording changes from run to run. Check
+the numbers anyway: in one run the agent got S-007's lines and cost right and still added its units up to
+9,750.
 
 ### Reset and teardown
 

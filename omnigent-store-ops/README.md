@@ -187,8 +187,7 @@ API (`POST /api/2.0/omnigent/v1/sessions` with `host_type: external` and the hos
 host that the platform starts for you, pass `--managed` instead of `--host-id`. `ask` sends one message,
 waits for the turn, and prints the tool calls and the reply.
 
-What to expect, from the run on November 24, 2026 (each turn took 30 to 80 seconds, and the four together
-came to $0.39 in model costs):
+What to expect, from the run on November 24, 2026 (each turn took 30 to 80 seconds):
 
 | Question | The agent's tools | What a right answer says |
 | --- | --- | --- |
